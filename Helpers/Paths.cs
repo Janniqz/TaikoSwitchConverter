@@ -2,6 +2,7 @@ namespace TaikoSwitchConverter.Helpers;
 
 public static class Paths
 {
+    public static readonly FileInfo ConfigPath = new("./config.ini");
     public static readonly FileInfo TnsToolPath = new("./tns2tool/tns2tool.exe");
     public static readonly FileInfo DonderfulExtractorPath = new("./DonderfulJSONExtractor/DonderfulJSONExtractor.exe");
  
