@@ -22,14 +22,14 @@ public static class Paths
     public static readonly FileInfo SteamInitialPossessionFinalTemp = new("./Temp/initial_possession.bin");
     
     // Steam OUT
-    public static readonly DirectoryInfo SteamCsvOut = new("./OUT/steam/fumencsv");
-    public static readonly DirectoryInfo SteamFumenOut = new("./OUT/steam/fumen");
-    public static readonly DirectoryInfo SteamSongOut = new("./OUT/steam/sound");
+    public static readonly DirectoryInfo SteamCsvOut = new("./OUT/fumencsv");
+    public static readonly DirectoryInfo SteamFumenOut = new("./OUT/fumen");
+    public static readonly DirectoryInfo SteamSongOut = new("./OUT/sound");
     
-    public static readonly FileInfo SteamMusicInfoOut = new("./OUT/steam/ReadAssets/musicinfo.bin");
-    public static readonly FileInfo SteamInitialPossessionOut = new("./OUT/steam/ReadAssets/initial_possession.bin");
+    public static readonly FileInfo SteamMusicInfoOut = new("./OUT/ReadAssets/musicinfo.bin");
+    public static readonly FileInfo SteamInitialPossessionOut = new("./OUT/ReadAssets/initial_possession.bin");
     
-    public static readonly DirectoryInfo SteamDataOut = new("./OUT/steam/ReadAssets");
+    public static readonly DirectoryInfo SteamDataOut = new("./OUT/ReadAssets");
     
     // Switch IN
     public static readonly FileInfo SwitchMusicData = new("./IN/switch/musicdata.unity3d");
