@@ -2,8 +2,8 @@
 Simple project for automating the conversion between Switch Taiko Assets & Steam ones.<br>
 Tested with Taiko no Tatsujin: Rhythm Festival and the Shin Ultramix PLUS ULTRA v3 for the Switch.
 
-# Requirements
-- tns2tool (https://github.com/cainan-c/tns2tool) - Tested with 0.2.2
+# Used Libraries
+- tns2tool (https://github.com/cainan-c/tns2tool)
 - DonderfulJSONExtractor (https://github.com/despairoharmony/DonderfulTools)
 
 # Settings

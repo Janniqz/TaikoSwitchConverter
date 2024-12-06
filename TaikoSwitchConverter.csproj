@@ -12,7 +12,7 @@
     </ItemGroup>
 
     <Target Name="CreateDirectories" AfterTargets="Build">
-        <MakeDir Directories="$(OutDir)IN;$(OutDir)IN\steam;$(OutDir)IN\switch;$(OutDir)IN\switch\csv;$(OutDir)IN\switch\fumen;$(OutDir)IN\switch\presong;$(OutDir)IN\switch\song;$(OutDir)tns2tool;$(OutDir)DonderfulJSONExtractor"/>
+        <MakeDir Directories="$(OutDir)IN;$(OutDir)IN\steam;$(OutDir)IN\switch;$(OutDir)IN\switch\csv;$(OutDir)IN\switch\fumen;$(OutDir)IN\switch\presong;$(OutDir)IN\switch\song"/>
     </Target>
     
     <ItemGroup>
@@ -22,6 +22,12 @@
     
     <ItemGroup>
       <None Update="config.ini">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="DonderfulJSONExtractor\**">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="tns2tool\**">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
