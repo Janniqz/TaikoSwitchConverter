@@ -8,6 +8,7 @@ public static class Paths
  
     public static readonly DirectoryInfo TempDirectory = new("./Temp");
     public static readonly DirectoryInfo FumenTempDirectory = new("./Temp/fumen");
+    public static readonly DirectoryInfo SongTempDirectory = new("./Temp/song");
     
     // Steam IN
     public static readonly FileInfo SteamMusicInfo = new("./IN/steam/musicinfo.bin");
@@ -112,6 +113,7 @@ public static class Paths
 
         CreateOrCleanDirectory(TempDirectory);
         CreateOrCleanDirectory(FumenTempDirectory);
+        CreateOrCleanDirectory(SongTempDirectory);
 
         CreateOrCleanDirectory(SteamCsvOut);
         CreateOrCleanDirectory(SteamFumenOut);

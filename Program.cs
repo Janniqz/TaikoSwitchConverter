@@ -15,10 +15,13 @@ class Program
     // Switch
     private static MusicData _musicData = new();
     private static WordData _wordData = new();
+
+    private static List<string> _availableSongs = [];
     
     private static int _startingUniqueID = -1;
     private static int _maxUniqueID = -1;
-
+    private static List<string> _excludedSongs = [];
+    
     public static bool Quiet;
     
     private static void Main(string[] args)
@@ -38,14 +41,18 @@ class Program
         var config = Configuration.LoadFromFile(Paths.ConfigPath.FullName);
         _startingUniqueID = config["General"]["StartingUniqueID"].IntValue;
         _maxUniqueID = config["General"]["MaxUniqueID"].IntValue;
+        _excludedSongs = config["General"]["ExcludedSongs"].StringValue.Split(',').ToList();
         
         RetrieveSteamData();
         RetrieveSwitchData();
+        FilterSwitchFiles();
 
         UpdateSteamData();
         
         SerializeSteamData();
         EncryptSwitchFiles();
+
+        CleanTempFiles();
         
         Console.WriteLine("Finished! :)");
     }
@@ -104,6 +111,31 @@ class Program
         _wordData = JsonConvert.DeserializeObject<WordData>(File.ReadAllText(wordDataJson.FullName))!;
     }
 
+    private static void FilterSwitchFiles()
+    {
+        var songDirectory = Paths.SwitchSong;
+        var presongDirectory = Paths.SwitchPresong;
+        
+        var songTempDirectory = Paths.SongTempDirectory;
+
+        foreach (var songFile in songDirectory.GetFiles("*.acb", SearchOption.AllDirectories))
+        {
+            var fileName = Path.GetFileNameWithoutExtension(songFile.Name);
+            if (_excludedSongs.Any(ex => fileName.EndsWith(ex, StringComparison.CurrentCultureIgnoreCase)))
+                continue;
+            
+            songFile.CopyTo(songTempDirectory.FullName + "/" + songFile.Name, true);
+            _availableSongs.Add(Path.GetFileNameWithoutExtension(songFile.Name));
+        }
+
+        foreach (var presongFile in presongDirectory.GetFiles("*.acb", SearchOption.AllDirectories))
+        {
+            if (!_availableSongs.Contains(Path.GetFileNameWithoutExtension(presongFile.Name[1..])))
+                continue;
+            presongFile.CopyTo(songTempDirectory.FullName + "/" + presongFile.Name, true);
+        }
+    }
+    
     private static void UpdateSteamData()
     {
         var currentUniqueID = _startingUniqueID;
@@ -111,6 +143,11 @@ class Program
         foreach (var musicData in _musicData.MusicDatas)
         {
             var wordData = _wordData.GetSongWordData(musicData.ID);
+            
+            if (_excludedSongs.Contains(musicData.ID))
+                continue;
+            if (!_availableSongs.Contains(musicData.SongFileName))
+                continue;
             
             // Already exists in some form
             if (_musicInfos.HasMusicInfo(musicData.ID))
@@ -209,8 +246,7 @@ class Program
         var csvDirectory = Paths.SwitchCsv;
         var fumenDirectory = Paths.SwitchFumen;
         var fumenTempDirectory = Paths.FumenTempDirectory;
-        var songDirectory = Paths.SwitchSong;
-        var presongDirectory = Paths.SwitchPresong;
+        var songTempDirectory = Paths.SongTempDirectory;
         
         // Move fumen files to temp directory as they're in subfolders in the Switch Files
         Console.WriteLine("Copying Fumen Files to Temp Directory...");
@@ -219,8 +255,7 @@ class Program
         
         EncryptionHelper.EncryptPath(csvDirectory, true);
         EncryptionHelper.EncryptPath(fumenTempDirectory, true);
-        EncryptionHelper.EncryptPath(songDirectory, false);
-        EncryptionHelper.EncryptPath(presongDirectory, false);
+        EncryptionHelper.EncryptPath(songTempDirectory, false);
         
         Console.WriteLine("Moving Encrypted CSV Files to Steam Directories...");
         var csvOutDirectory = new DirectoryInfo(Paths.SwitchCsv + "_encrypted");
@@ -233,13 +268,14 @@ class Program
             outFumen.MoveTo(Paths.SteamFumenOut.FullName + "/" + outFumen.Name, true);
         
         Console.WriteLine("Moving Encrypted Song Files to Steam Directories...");
-        var songOutDirectory = new DirectoryInfo(Paths.SwitchSong + "_encrypted");
+        var songOutDirectory = new DirectoryInfo(Paths.SongTempDirectory + "_encrypted");
         foreach (var outSong in songOutDirectory.EnumerateFiles())
             outSong.MoveTo(Paths.SteamSongOut.FullName + "/" + outSong.Name, true);
-        
-        Console.WriteLine("Moving Encrypted Presong Files to Steam Directories...");
-        var presongOutDirectory = new DirectoryInfo(Paths.SwitchPresong + "_encrypted");
-        foreach (var outPresong in presongOutDirectory.EnumerateFiles())
-            outPresong.MoveTo(Paths.SteamSongOut.FullName + "/" + outPresong.Name, true);
+    }
+
+    private static void CleanTempFiles()
+    {
+        Paths.FumenTempDirectory.Delete(true);
+        Paths.SongTempDirectory.Delete(true);
     }
 }

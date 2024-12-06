@@ -9,6 +9,7 @@ Tested with Taiko no Tatsujin: Rhythm Festival and the Shin Ultramix PLUS ULTRA 
 # Settings
 - StartingUniqueID: First ID to use for new songs (Inclusive)
 - MaxUniqueID: Highest ID to use for new songs (Exclusive)
+- ExcludedSongs: Comma-separated list of IDs to exclude from processing
 
 NOTE: The script checks if the ID is already in use so nothing is overwritten.
 
