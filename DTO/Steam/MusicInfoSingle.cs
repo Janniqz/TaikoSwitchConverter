@@ -1,9 +1,16 @@
 using Newtonsoft.Json;
+// ReSharper disable InconsistentNaming
 
 namespace TaikoSwitchConverter.DTO.Steam;
 
 public class MusicInfoSingle
 {
+    [JsonIgnore] private string FontJP => "<font=jp>";
+    [JsonIgnore] private string FontEN => "<font=efigs>";
+    [JsonIgnore] private string FontTW => "<font=tw>";
+    [JsonIgnore] private string FontCN => "<font=cn>";
+    [JsonIgnore] private string FontKO => "<font=ko>";
+    
     [JsonProperty("UniqueId", Required = Required.Always)]
     public int UniqueID { get; set; }
     [JsonProperty("Id", Required = Required.Always)]
@@ -132,55 +139,47 @@ public class MusicInfoSingle
 
     [JsonProperty("SongNameJP")] public string FullSongNameJP
     {
-        get => $"{SongSubJP}{SongNameJP}";
+        get => $"{FontJP}{SongNameJP}";
         set => SongNameJP = value.Substring(9);
     }
-    
     [JsonProperty("SongNameEN")] public string FullSongNameEN
     {
-        get => $"{SongSubEN}{SongNameEN}";
+        get => $"{FontEN}{SongNameEN}";
         set => SongNameEN = value.Substring(12);
     }
-    
     [JsonProperty("SongNameFR")] public string FullSongNameFR
     {
-        get => $"{SongSubFR}{SongNameFR}";
+        get => $"{FontEN}{SongNameFR}";
         set => SongNameFR = value.Substring(12);
     }
-    
     [JsonProperty("SongNameIT")] public string FullSongNameIT
     {
-        get => $"{SongSubIT}{SongNameIT}";
+        get => $"{FontEN}{SongNameIT}";
         set => SongNameIT = value.Substring(12);
     }
-    
     [JsonProperty("SongNameDE")] public string FullSongNameDE
     {
-        get => $"{SongSubDE}{SongNameDE}";
+        get => $"{FontEN}{SongNameDE}";
         set => SongNameDE = value.Substring(12);
     }
-    
     [JsonProperty("SongNameES")] public string FullSongNameES
     {
-        get => $"{SongSubES}{SongNameES}";
+        get => $"{FontEN}{SongNameES}";
         set => SongNameES = value.Substring(12);
     }
-    
     [JsonProperty("SongNameTW")] public string FullSongNameTW
     {
-        get => $"{SongSubTW}{SongNameTW}";
+        get => $"{FontTW}{SongNameTW}";
         set => SongNameTW = value.Substring(9);
     }
-    
     [JsonProperty("SongNameCN")] public string FullSongNameCN
     {
-        get => $"{SongSubCN}{SongNameCN}";
+        get => $"{FontCN}{SongNameCN}";
         set => SongNameCN = value.Substring(9);
     }
-    
     [JsonProperty("SongNameKO")] public string FullSongNameKO
     {
-        get => $"{SongSubKO}{SongNameKO}";
+        get => $"{FontKO}{SongNameKO}";
         set => SongNameKO = value.Substring(9);
     }
     
