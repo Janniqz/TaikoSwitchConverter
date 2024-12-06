@@ -123,6 +123,7 @@ public static class Paths
     
     private static void CreateOrCleanDirectory(DirectoryInfo directory)
     {
+        if (!Program.Quiet)
             Console.WriteLine("Cleaning directory {0}.", directory.FullName);
         
         if (!directory.Exists)

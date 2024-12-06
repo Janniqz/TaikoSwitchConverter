@@ -16,7 +16,7 @@ public static class ExtractorHelper
         {
             FileName = Paths.DonderfulExtractorPath.FullName,
             WorkingDirectory = path.Directory!.FullName,
-            UseShellExecute = false,
+            UseShellExecute = true,
             CreateNoWindow = false,
             Arguments = path.FullName
         };

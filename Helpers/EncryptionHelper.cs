@@ -48,7 +48,7 @@ public static class EncryptionHelper
         return new ProcessStartInfo
         {
             FileName = Paths.TnsToolPath.FullName,
-            UseShellExecute = false,
+            UseShellExecute = true,
             CreateNoWindow = false,
             Arguments = arguments
         };

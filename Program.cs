@@ -19,8 +19,15 @@ class Program
     private static int _startingUniqueID = -1;
     private static int _maxUniqueID = -1;
 
-    private static void Main()
+    public static bool Quiet;
+    
+    private static void Main(string[] args)
     {
+        if (args.Length != 0)
+        {
+            if (args.Contains("-q"))
+                Quiet = true;
+        }
         
         // Check required Directories + Files
         var result = Paths.CheckRequiredPaths();
@@ -108,6 +115,7 @@ class Program
             // Already exists in some form
             if (_musicInfos.HasMusicInfo(musicData.ID))
             {
+                if (!Quiet)
                     Console.WriteLine("Music Info with ID {0} already exists in the Steam Music Info.", musicData.ID);
                 continue;
             }
