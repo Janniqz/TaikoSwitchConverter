@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SharpConfig;
 using TaikoSwitchConverter.DTO.Steam;
 using TaikoSwitchConverter.DTO.Switch;
 using TaikoSwitchConverter.Helpers;
@@ -15,11 +16,17 @@ class Program
     private static MusicData _musicData = new();
     private static WordData _wordData = new();
     
-    private const int StartingUniqueID = 1500;
-    private const int MaxUniqueID = 3000;
+    private static int _startingUniqueID = -1;
+    private static int _maxUniqueID = -1;
 
     private static void Main()
     {
+        // Load Config
+        var config = Configuration.LoadFromFile( "config.ini" );
+        _startingUniqueID = config["General"]["StartingUniqueID"].IntValue;
+        _maxUniqueID = config["General"]["MaxUniqueID"].IntValue;
+        
+        // Check required Directories + Files
         var result = Paths.CheckRequiredPaths();
         if (!result)
             return;
@@ -75,7 +82,7 @@ class Program
 
     private static void UpdateSteamData()
     {
-        var currentUniqueID = StartingUniqueID;
+        var currentUniqueID = _startingUniqueID;
         
         foreach (var musicData in _musicData.MusicDatas)
         {
@@ -88,7 +95,7 @@ class Program
             while (_musicInfos.HasID(currentUniqueID))
                 currentUniqueID++;
             
-            if (currentUniqueID >= MaxUniqueID)
+            if (currentUniqueID >= _maxUniqueID)
                 break;
             
             // Create Music Info
