@@ -21,15 +21,16 @@ class Program
 
     private static void Main()
     {
-        // Load Config
-        var config = Configuration.LoadFromFile( "config.ini" );
-        _startingUniqueID = config["General"]["StartingUniqueID"].IntValue;
-        _maxUniqueID = config["General"]["MaxUniqueID"].IntValue;
         
         // Check required Directories + Files
         var result = Paths.CheckRequiredPaths();
         if (!result)
             return;
+        
+        // Load Config
+        var config = Configuration.LoadFromFile(Paths.ConfigPath.FullName);
+        _startingUniqueID = config["General"]["StartingUniqueID"].IntValue;
+        _maxUniqueID = config["General"]["MaxUniqueID"].IntValue;
         
         RetrieveSteamData();
         RetrieveSwitchData();
@@ -38,6 +39,8 @@ class Program
         
         SerializeSteamData();
         EncryptSwitchFiles();
+        
+        Console.WriteLine("Finished! :)");
     }
 
     private static void RetrieveSteamData()
@@ -47,11 +50,18 @@ class Program
         
         var musicInfoJson = Paths.SteamMusicInfoJson;
         var initialPossessionJson = Paths.SteamInitialPossessionJson;
-        
+
         if (!musicInfoJson.Exists)
-            return;
+        {
+            Console.WriteLine("Steam Music Info JSON not found at {0}. Did something go wrong with tns2tool?", musicInfoJson.FullName);
+            throw new Exception();
+        }
+
         if (!initialPossessionJson.Exists)
-            return;
+        {
+            Console.WriteLine("Steam Initial Possession JSON not found at {0}. Did something go wrong with tns2tool?", initialPossessionJson.FullName);
+            throw new Exception();
+        }
         
         musicInfoJson.MoveTo(Paths.SteamMusicInfoJsonTemp.FullName, true);
         initialPossessionJson.MoveTo(Paths.SteamInitialPossessionJsonTemp.FullName, true);
@@ -67,11 +77,18 @@ class Program
         
         var musicDataJson = Paths.SwitchMusicDataJson;
         var wordDataJson = Paths.SwitchWordDataJson;
-        
+
         if (!musicDataJson.Exists)
-            return;
+        {
+            Console.WriteLine("Switch Music Data JSON not found at {0}. Did something go wrong with DonderfulJSONExtractor?", musicDataJson.FullName);
+            throw new Exception();
+        }
+
         if (!wordDataJson.Exists)
-            return;
+        {
+            Console.WriteLine("Switch Word Data JSON not found at {0}. Did something go wrong with DonderfulJSONExtractor?", wordDataJson.FullName);
+            throw new Exception();
+        }
         
         musicDataJson.MoveTo(Paths.TempDirectory.FullName + "/musicdata.json", true);
         wordDataJson.MoveTo(Paths.TempDirectory.FullName + "/worddata.json", true);
@@ -90,13 +107,19 @@ class Program
             
             // Already exists in some form
             if (_musicInfos.HasMusicInfo(musicData.ID))
+            {
+                    Console.WriteLine("Music Info with ID {0} already exists in the Steam Music Info.", musicData.ID);
                 continue;
+            }
 
             while (_musicInfos.HasID(currentUniqueID))
                 currentUniqueID++;
-            
+
             if (currentUniqueID >= _maxUniqueID)
+            {
+                Console.WriteLine("Reached the maximum Unique ID of {0}.", _maxUniqueID);
                 break;
+            }
             
             // Create Music Info
             var musicInfo = new MusicInfoSingle
@@ -182,6 +205,7 @@ class Program
         var presongDirectory = Paths.SwitchPresong;
         
         // Move fumen files to temp directory as they're in subfolders in the Switch Files
+        Console.WriteLine("Copying Fumen Files to Temp Directory...");
         foreach (var fumenFile in fumenDirectory.GetFiles("*.bin", SearchOption.AllDirectories))
             fumenFile.CopyTo(fumenTempDirectory.FullName + "/" + fumenFile.Name, true);
         
@@ -190,18 +214,22 @@ class Program
         EncryptionHelper.EncryptPath(songDirectory, false);
         EncryptionHelper.EncryptPath(presongDirectory, false);
         
+        Console.WriteLine("Moving Encrypted CSV Files to Steam Directories...");
         var csvOutDirectory = new DirectoryInfo(Paths.SwitchCsv + "_encrypted");
         foreach (var outCsv in csvOutDirectory.EnumerateFiles())
             outCsv.MoveTo(Paths.SteamCsvOut.FullName + "/" + outCsv.Name, true);
         
+        Console.WriteLine("Moving Encrypted Fumen Files to Steam Directories...");
         var fumenOutDirectory = new DirectoryInfo(Paths.FumenTempDirectory + "_encrypted");
         foreach (var outFumen in fumenOutDirectory.EnumerateFiles())
             outFumen.MoveTo(Paths.SteamFumenOut.FullName + "/" + outFumen.Name, true);
         
+        Console.WriteLine("Moving Encrypted Song Files to Steam Directories...");
         var songOutDirectory = new DirectoryInfo(Paths.SwitchSong + "_encrypted");
         foreach (var outSong in songOutDirectory.EnumerateFiles())
             outSong.MoveTo(Paths.SteamSongOut.FullName + "/" + outSong.Name, true);
         
+        Console.WriteLine("Moving Encrypted Presong Files to Steam Directories...");
         var presongOutDirectory = new DirectoryInfo(Paths.SwitchPresong + "_encrypted");
         foreach (var outPresong in presongOutDirectory.EnumerateFiles())
             outPresong.MoveTo(Paths.SteamSongOut.FullName + "/" + outPresong.Name, true);

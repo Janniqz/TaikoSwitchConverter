@@ -44,28 +44,71 @@ public static class Paths
     
     public static bool CheckRequiredPaths()
     {
+        if (!ConfigPath.Exists)
+        {
+            Console.WriteLine("Config file not found at {0}.", ConfigPath.FullName);
+            return false;
+        }
+
         if (!TnsToolPath.Exists)
+        {
+            Console.WriteLine("TnsTool not found at {0}.", TnsToolPath.FullName);
             return false;
+        }
+
         if (!DonderfulExtractorPath.Exists)
+        {
+            Console.WriteLine("DonderfulJSONExtractor not found at {0}.", DonderfulExtractorPath.FullName);
             return false;
-        
+        }
+
         if (!SteamMusicInfo.Exists)
+        {
+            Console.WriteLine("Steam musicinfo.bin not found at {0}.", SteamMusicInfo.FullName);
             return false;
+        }
+
         if (!SteamInitialPossession.Exists)
+        {
+            Console.WriteLine("Steam initial_possession.bin not found at {0}.", SteamInitialPossession.FullName);
             return false;
-        
+        }
+
         if (!SwitchMusicData.Exists)
+        {
+            Console.WriteLine("Switch musicdata.unity3d not found at {0}.", SwitchMusicData.FullName);
             return false;
+        }
+
         if (!SwitchWordData.Exists)
+        {
+            Console.WriteLine("Switch worddata.unity3d not found at {0}.", SwitchWordData.FullName);
             return false;
+        }
+
         if (!SwitchCsv.Exists)
+        {
+            Console.WriteLine("Switch CSV directory not found at {0}.", SwitchCsv.FullName);
             return false;
+        }
+
         if (!SwitchFumen.Exists)
+        {
+            Console.WriteLine("Switch Fumen directory not found at {0}.", SwitchFumen.FullName);
             return false;
+        }
+
         if (!SwitchPresong.Exists)
+        {
+            Console.WriteLine("Switch Presong directory not found at {0}.", SwitchPresong.FullName);
             return false;
+        }
+
         if (!SwitchSong.Exists)
+        {
+            Console.WriteLine("Switch Song directory not found at {0}.", SwitchSong.FullName);
             return false;
+        }
 
         CreateOrCleanDirectory(TempDirectory);
         CreateOrCleanDirectory(FumenTempDirectory);
@@ -80,6 +123,8 @@ public static class Paths
     
     private static void CreateOrCleanDirectory(DirectoryInfo directory)
     {
+            Console.WriteLine("Cleaning directory {0}.", directory.FullName);
+        
         if (!directory.Exists)
             directory.Create();
         else

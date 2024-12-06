@@ -1,11 +1,14 @@
 using System.Diagnostics;
-using System.Reflection;
 
 namespace TaikoSwitchConverter.Helpers;
 
 public static class ExtractorHelper
 {
-    public static void Extract(FileInfo filePath) => Process.Start(GetBaseProcessInfo(filePath))!.WaitForExit();
+    public static void Extract(FileInfo filePath)
+    {
+        Console.WriteLine("Extracting {0}...", filePath.FullName);
+        Process.Start(GetBaseProcessInfo(filePath))!.WaitForExit();
+    }
 
     private static ProcessStartInfo GetBaseProcessInfo(FileInfo path)
     {
