@@ -143,6 +143,14 @@ class Program
         foreach (var musicData in _musicData.MusicDatas)
         {
             var wordData = _wordData.GetSongWordData(musicData.ID);
+            var subtitleWordData = _wordData.GetSongSubtitleWordData(musicData.ID);
+
+            if (wordData == null)
+            {
+                if (!Quiet)
+                    Console.WriteLine("Word Data with ID {0} not found in the Switch Word Data.", musicData.ID);
+                continue;
+            }
             
             if (_excludedSongs.Contains(musicData.ID))
                 continue;
@@ -195,19 +203,24 @@ class Program
                 ShinutiManiaDuet = musicData.ShinutiManiaDuet,
                 ShinutiUraDuet = musicData.ShinutiOniDuet,
                 SongNameJP = wordData.JapaneseText,
+                SongSubJP = subtitleWordData?.JapaneseText ?? string.Empty,
                 SongNameEN = wordData.EnglishText,
+                SongSubEN = subtitleWordData?.EnglishText ?? string.Empty,
                 SongNameFR = wordData.FrenchText,
+                SongSubFR = subtitleWordData?.FrenchText ?? string.Empty,
                 SongNameIT = wordData.ItalianText,
+                SongSubIT = subtitleWordData?.ItalianText ?? string.Empty,
                 SongNameDE = wordData.GermanText,
+                SongSubDE = subtitleWordData?.GermanText ?? string.Empty,
                 SongNameES = wordData.SpanishText,
+                SongSubES = subtitleWordData?.SpanishText ?? string.Empty,
                 SongNameTW = wordData.TaiwaneseText,
+                SongSubTW = subtitleWordData?.TaiwaneseText ?? string.Empty,
                 SongNameCN = wordData.ChineseSimplifiedText,
-                SongNameKO = wordData.KoreanText
+                SongSubCN = subtitleWordData?.ChineseSimplifiedText ?? string.Empty,
+                SongNameKO = wordData.KoreanText,
+                SongSubKO = subtitleWordData?.KoreanText ?? string.Empty
             };
-
-            var valid = musicInfo.UpdateSongName();
-            if (!valid)
-                continue;
             
             var possessionInfo = new InitialPossessionSingle()
             {
