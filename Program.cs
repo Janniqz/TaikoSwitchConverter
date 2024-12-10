@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text;
+using Newtonsoft.Json;
 using SharpConfig;
 using TaikoSwitchConverter.DTO.Steam;
 using TaikoSwitchConverter.DTO.Switch;
@@ -17,6 +18,7 @@ class Program
     private static WordData _wordData = new();
 
     private static List<string> _availableSongs = [];
+    private static List<Tuple<string, string>> _ignoredSongs = [];
     
     private static int _startingUniqueID = -1;
     private static int _maxUniqueID = -1;
@@ -53,6 +55,7 @@ class Program
         EncryptSwitchFiles();
 
         CleanTempFiles();
+        WriteIgnoredSongs();
         
         Console.WriteLine("Finished! :)");
     }
@@ -122,7 +125,10 @@ class Program
         {
             var fileName = Path.GetFileNameWithoutExtension(songFile.Name);
             if (_excludedSongs.Any(ex => fileName.EndsWith(ex, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                _ignoredSongs.Add(new Tuple<string, string>(fileName, "Excluded"));
                 continue;
+            }
             
             songFile.CopyTo(songTempDirectory.FullName + "/" + songFile.Name, true);
             _availableSongs.Add(Path.GetFileNameWithoutExtension(songFile.Name));
@@ -131,7 +137,10 @@ class Program
         foreach (var presongFile in presongDirectory.GetFiles("*.acb", SearchOption.AllDirectories))
         {
             if (!_availableSongs.Contains(Path.GetFileNameWithoutExtension(presongFile.Name[1..])))
+            {
+                _ignoredSongs.Add(new Tuple<string, string>(presongFile.Name, "Not in Song Directory"));
                 continue;
+            }
             presongFile.CopyTo(songTempDirectory.FullName + "/" + presongFile.Name, true);
         }
     }
@@ -139,27 +148,30 @@ class Program
     private static void UpdateSteamData()
     {
         var currentUniqueID = _startingUniqueID;
-        
-        foreach (var musicData in _musicData.MusicDatas)
+
+        for (var index = 0; index < _musicData.MusicDatas.Count; index++)
         {
+            var musicData = _musicData.MusicDatas[index];
             var wordData = _wordData.GetSongWordData(musicData.ID);
             var subtitleWordData = _wordData.GetSongSubtitleWordData(musicData.ID);
 
             if (wordData == null)
             {
+                _ignoredSongs.Add(new Tuple<string, string>(musicData.ID, "Word Data Not Found"));
                 if (!Quiet)
                     Console.WriteLine("Word Data with ID {0} not found in the Switch Word Data.", musicData.ID);
                 continue;
             }
-            
+
             if (_excludedSongs.Contains(musicData.ID))
                 continue;
             if (!_availableSongs.Contains(musicData.SongFileName))
                 continue;
-            
+
             // Already exists in some form
             if (_musicInfos.HasMusicInfo(musicData.ID))
             {
+                _ignoredSongs.Add(new Tuple<string, string>(musicData.ID, "Already Exists"));
                 if (!Quiet)
                     Console.WriteLine("Music Info with ID {0} already exists in the Steam Music Info.", musicData.ID);
                 continue;
@@ -170,10 +182,15 @@ class Program
 
             if (currentUniqueID >= _maxUniqueID)
             {
+                // Get all remaining songs
+                var remainingSongs = _musicData.MusicDatas.Skip(index).Select(m => m.ID).ToList();
+                foreach (var song in remainingSongs)
+                    _ignoredSongs.Add(new Tuple<string, string>(song, "Max Unique ID Reached"));
+
                 Console.WriteLine("Reached the maximum Unique ID of {0}.", _maxUniqueID);
                 break;
             }
-            
+
             // Create Music Info
             var musicInfo = new MusicInfoSingle
             {
@@ -221,13 +238,13 @@ class Program
                 SongNameKO = wordData.KoreanText,
                 SongSubKO = subtitleWordData?.KoreanText ?? string.Empty
             };
-            
+
             var possessionInfo = new InitialPossessionSingle()
             {
                 Type = 4,
                 ID = currentUniqueID
             };
-            
+
             _musicInfos.MusicInfos.Add(musicInfo);
             _initialPossessions.InitialPossessions.Add(possessionInfo);
         }
@@ -285,10 +302,26 @@ class Program
         foreach (var outSong in songOutDirectory.EnumerateFiles())
             outSong.MoveTo(Paths.SteamSongOut.FullName + "/" + outSong.Name, true);
     }
-
+    
     private static void CleanTempFiles()
     {
         Paths.FumenTempDirectory.Delete(true);
         Paths.SongTempDirectory.Delete(true);
+    }
+    
+    private static void WriteIgnoredSongs()
+    {
+        var ignoredSongs = Paths.IgnoredSongs;
+        if (ignoredSongs.Exists)
+            ignoredSongs.Delete();
+        
+        var sb = new StringBuilder();
+        sb.AppendLine($"Ignored Count: {_ignoredSongs.Count}");
+        sb.AppendLine("");
+        
+        foreach (var (song, reason) in _ignoredSongs)
+            sb.AppendLine($"{song} - {reason}");
+        
+        File.WriteAllText(ignoredSongs.FullName, sb.ToString());
     }
 }

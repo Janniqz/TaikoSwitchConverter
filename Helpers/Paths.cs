@@ -32,6 +32,8 @@ public static class Paths
     
     public static readonly DirectoryInfo SteamDataOut = new("./OUT/ReadAssets");
     
+    public static readonly FileInfo IgnoredSongs = new("./OUT/ignored_songs.txt");
+    
     // Switch IN
     public static readonly FileInfo SwitchMusicData = new("./IN/switch/musicdata.unity3d");
     public static readonly FileInfo SwitchWordData = new("./IN/switch/worddata.unity3d");
